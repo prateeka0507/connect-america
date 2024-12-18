@@ -17,6 +17,7 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const [textareaHeight, setTextareaHeight] = useState('60px');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -116,15 +117,22 @@ export default function ChatPage() {
     }
   };
 
-  const adjustTextareaHeight = (element: HTMLTextAreaElement) => {
+  const updateTextareaHeight = (element: HTMLTextAreaElement) => {
+    const minHeight = 60;
+    const maxHeight = 150;
+    
     element.style.height = 'auto';
-    element.style.height = `${element.scrollHeight}px`;
+    
+    const newHeight = Math.min(Math.max(element.scrollHeight, minHeight), maxHeight);
+    
+    element.style.height = `${newHeight}px`;
+    setTextareaHeight(`${newHeight}px`);
   };
 
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.focus();
-      adjustTextareaHeight(textareaRef.current);
+      updateTextareaHeight(textareaRef.current);
     }
   }, []);
 
@@ -340,7 +348,7 @@ export default function ChatPage() {
         </div>
 
         {/* Input Area */}
-        <div className="bg-[#F0F2FF]">
+        <div className="bg-[#F0F2FF] sticky bottom-0 z-10">
           <form 
             ref={formRef}
             onSubmit={handleSubmit} 
@@ -349,43 +357,60 @@ export default function ChatPage() {
             <textarea 
               ref={textareaRef}
               className="w-full bg-[#F5F7FF] focus:bg-white
-                text-gray-800 text-base sm:text-lg font-medium placeholder-gray-400
+                text-gray-800 text-base font-medium placeholder-gray-400
                 border-0 outline-none resize-none 
-                py-6 px-6 sm:px-8
-                min-h-[80px] sm:min-h-[100px] max-h-[300px] 
-                overflow-auto transition-colors duration-200
+                py-4 px-6
+                overflow-auto transition-all duration-200
                 focus:ring-2 focus:ring-blue-500
-                cursor-text"
+                cursor-text
+                leading-normal"
+              style={{
+                height: textareaHeight,
+                maxHeight: '150px',
+                minHeight: '60px',
+              }}
               placeholder="Type your message here..."
               rows={1}
               value={inputValue}
               onChange={(e) => {
+                e.preventDefault();
                 const target = e.target;
                 setInputValue(target.value);
-                adjustTextareaHeight(target);
+                updateTextareaHeight(target);
               }}
               onFocus={(e) => {
-                const target = e.target;
-                setTimeout(() => adjustTextareaHeight(target), 0);
+                updateTextareaHeight(e.target);
               }}
               onClick={(e) => {
                 e.currentTarget.focus();
               }}
               disabled={loading}
-              onKeyDown={handleKeyDown}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (inputValue.trim()) {
+                    formRef.current?.requestSubmit();
+                  }
+                }
+              }}
               autoComplete="off"
               spellCheck="false"
-              style={{ WebkitAppearance: 'none' }}
             />
             <button 
               type="submit"
-              disabled={loading}
-              className="absolute right-4 sm:right-6 
+              disabled={loading || !inputValue.trim()}
+              className="absolute right-4
                 bg-[#0A0F5C] text-white 
-                p-3 sm:p-3.5
+                p-2.5
                 rounded-lg hover:bg-blue-900 
-                transition-colors disabled:opacity-50 
+                transition-colors 
+                disabled:opacity-50 
+                disabled:cursor-not-allowed
                 flex items-center justify-center"
+              style={{
+                top: '50%',
+                transform: 'translateY(-50%)'
+              }}
             >
               {loading ? (
                 <span className="animate-spin text-xl">⟳</span>
