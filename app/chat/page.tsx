@@ -16,6 +16,8 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -115,15 +117,17 @@ export default function ChatPage() {
     }
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      const form = e.currentTarget.form;
-      if (form) {
-        form.requestSubmit();
-      }
-    }
+  const adjustTextareaHeight = (element: HTMLTextAreaElement) => {
+    element.style.height = 'auto';
+    element.style.height = `${element.scrollHeight}px`;
   };
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+      adjustTextareaHeight(textareaRef.current);
+    }
+  }, []);
 
   const References = ({ urls }: { urls: Array<{ url: string; content: string }> }) => {
     if (!urls || urls.length === 0) return null;
@@ -328,30 +332,46 @@ export default function ChatPage() {
 
         {/* Input Area */}
         <div className="bg-[#F0F2FF]">
-          <form onSubmit={handleSubmit} className="relative flex items-center">
+          <form 
+            ref={formRef}
+            onSubmit={handleSubmit} 
+            className="relative flex items-center"
+          >
             <textarea 
+              ref={textareaRef}
               className="w-full bg-[#F5F7FF] focus:bg-white
-              text-gray-800 text-base sm:text-lg font-medium placeholder-gray-400
-              border-0 outline-none resize-none 
-              py-6 px-6 sm:px-8
-              min-h-[80px] sm:min-h-[100px] max-h-[300px] 
-              overflow-auto transition-colors duration-200
-              focus:ring-2 focus:ring-blue-500"
+                text-gray-800 text-base sm:text-lg font-medium placeholder-gray-400
+                border-0 outline-none resize-none 
+                py-6 px-6 sm:px-8
+                min-h-[80px] sm:min-h-[100px] max-h-[300px] 
+                overflow-auto transition-colors duration-200
+                focus:ring-2 focus:ring-blue-500
+                cursor-text"
               placeholder="Type your message here..."
               rows={1}
               value={inputValue}
               onChange={(e) => {
-                 e.preventDefault();
-                setInputValue(e.target.value);
-                setTimeout(() => {
-                  e.target.style.height = 'inherit';
-                  e.target.style.height = `${e.target.scrollHeight}px`;
-                }, 0);
+                const target = e.target;
+                setInputValue(target.value);
+                adjustTextareaHeight(target);
+              }}
+              onFocus={(e) => {
+                const target = e.target;
+                setTimeout(() => adjustTextareaHeight(target), 0);
+              }}
+              onClick={(e) => {
+                e.currentTarget.focus();
               }}
               disabled={loading}
-              onKeyDown={handleKeyDown}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  formRef.current?.requestSubmit();
+                }
+              }}
               autoComplete="off"
               spellCheck="false"
+              style={{ WebkitAppearance: 'none' }}
             />
             <button 
               type="submit"
