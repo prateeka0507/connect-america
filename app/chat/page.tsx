@@ -335,17 +335,23 @@ export default function ChatPage() {
               border-0 outline-none resize-none 
               py-6 px-6 sm:px-8
               min-h-[80px] sm:min-h-[100px] max-h-[300px] 
-              overflow-auto transition-colors duration-200" 
+              overflow-auto transition-colors duration-200
+              focus:ring-2 focus:ring-blue-500"
               placeholder="Type your message here..."
               rows={1}
               value={inputValue}
               onChange={(e) => {
+                 e.preventDefault();
                 setInputValue(e.target.value);
-                e.target.style.height = 'inherit';
-                e.target.style.height = `${e.target.scrollHeight}px`;
+                setTimeout(() => {
+                  e.target.style.height = 'inherit';
+                  e.target.style.height = `${e.target.scrollHeight}px`;
+                }, 0);
               }}
               disabled={loading}
               onKeyDown={handleKeyDown}
+              autoComplete="off"
+              spellCheck="false"
             />
             <button 
               type="submit"
