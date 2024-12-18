@@ -106,7 +106,8 @@ export default function ChatPage() {
       try {
         const aiResponse = await sendMessageToAPI(inputValue);
         setMessages(prev => [...prev, aiResponse]);
-      } catch (err) {
+      } catch (err: unknown) {
+        console.error('Chat Error:', err);
         setError('Failed to get response. Please try again.');
       } finally {
         setLoading(false);
@@ -137,7 +138,7 @@ export default function ChatPage() {
           Referenced Documents
         </h2>
         <div className="flex flex-col gap-3">
-          {urls.map(({ url, content }, index) => (
+          {urls.map(({ url }, index) => (
             <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-blue-500 transition-colors bg-white shadow-sm hover:shadow-md">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
