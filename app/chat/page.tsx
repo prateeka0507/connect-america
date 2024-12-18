@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { KeyboardEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
@@ -194,6 +193,16 @@ export default function ChatPage() {
     );
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const form = e.currentTarget.form;
+      if (form) {
+        form.requestSubmit();
+      }
+    }
+  };
+
   return (
     <div className="flex h-screen relative">
       {/* Mobile Header */}
@@ -363,12 +372,7 @@ export default function ChatPage() {
                 e.currentTarget.focus();
               }}
               disabled={loading}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  formRef.current?.requestSubmit();
-                }
-              }}
+              onKeyDown={handleKeyDown}
               autoComplete="off"
               spellCheck="false"
               style={{ WebkitAppearance: 'none' }}
