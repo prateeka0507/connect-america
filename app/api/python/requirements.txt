@@ -1,15 +1,25 @@
+# Web Framework
 Flask
-Werkzeug
-python-docx
-python-dotenv
-langchain-openai
-langchain-pinecone
-langchain
-pinecone-client
-langsmith
 flask-cors
+Werkzeug
+
+# Database
 psycopg2-binary
-pillow
-torch
-requests
+python-dotenv
+
+# Document Processing
+python-docx
+
+# LangChain and OpenAI Integration
+langchain
+langchain-openai
+langsmith
 openai
+
+# Utilities
+tenacity
+numpy
+pydantic
+
+# Type Hints
+typing-extensions
