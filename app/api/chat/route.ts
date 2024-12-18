@@ -62,7 +62,8 @@ export async function POST(request: Request) {
       throw fetchError;
     }
     
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error('API Error:', error);
     return NextResponse.json({
       role: 'assistant',
       content: 'Sorry, something went wrong. Please try again.'
