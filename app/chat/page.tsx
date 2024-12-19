@@ -7,7 +7,7 @@ interface Message {
   content: string;
   urls?: Array<{ url: string; content: string }>;
 }
-
+export const maxDuration = 300;
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
