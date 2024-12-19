@@ -1,14 +1,14 @@
 // app/api/chat/route.ts
 
 import { NextResponse } from 'next/server';
-export const maxDuration = 300;
+
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   urls?: Array<{ url: string; content: string }>;
 }
-
+export const maxDuration = 300;
 export async function POST(request: Request) {
   const controller = new AbortController();
   try {
